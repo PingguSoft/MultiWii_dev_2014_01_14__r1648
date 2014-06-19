@@ -4,6 +4,110 @@
 /**************************************************************************************/
 /***************             test configurations                   ********************/
 /**************************************************************************************/
+#if defined(INTERBOARD_MULTIWII)
+  #undef  MEGA_HW_PWM_SERVOS
+
+  #define QUADX
+  #define I2C_SPEED 400000L
+  #define MPU6050       //combo + ACC
+  #define MPU6050_LPF_42HZ
+  #define MS561101BA
+  #define HMC5883
+  #define FORCE_ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  =  Y; imu.accADC[PITCH]  = -X; imu.accADC[YAW]  = Z;}
+  #define FORCE_GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] =  X; imu.gyroADC[PITCH] =  Y; imu.gyroADC[YAW] = -Z;}
+  #define FORCE_MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  = -Y; imu.magADC[PITCH]  =  X; imu.magADC[YAW]  = -Z;}
+
+  #define FAILSAFE
+
+  #define GPS_SERIAL 1
+  #define GPS_BAUD   115200
+  #define NMEA
+  //#define UBLOX
+  #define BUZZER
+  #define PILOTLAMP
+
+#if 1
+  /* for V BAT monitoring
+   after the resistor divisor we should get [0V;5V]->[0;1023] on analog V_BATPIN
+   with R1=47k and R2=10k
+   vbat = [0;450]*16/VBATSCALE
+   must be associated with #define BUZZER ! */
+  #define VBAT
+  #undef  VBATSCALE
+  #define VBATSCALE        51 // (*) change this value if readed Battery voltage is different than real voltage
+
+//  #define V_BATPIN A0
+#endif
+
+// LCD
+#if 0
+  #define OLED_I2C_128x64
+  #define DISPLAY_FONT_DSIZE
+
+  #define SUPPRESS_OLED_I2C_128x64LOGO
+  #define LCD_CONF
+  #define LCD_TELEMETRY
+  #define LCD_TELEMETRY_STEP "0123456789"
+#endif
+
+// SERVO
+  #define SERVO_TILT
+
+  #define TILT_PITCH_MIN    1020    //servo travel min, don't set it below 1020
+  #define TILT_PITCH_MAX    2000    //servo travel max, max value=2000
+  #define TILT_PITCH_MIDDLE 1500    //servo neutral value
+  #define TILT_PITCH_PROP   10      //servo proportional (tied to angle) ; can be negative to invert movement
+  #define TILT_PITCH_AUX_CH AUX4    //AUX channel to overwrite CAM pitch (AUX1-AUX4), comment to disable manual input and free the AUX channel
+
+  #define TILT_ROLL_MIN     1020
+  #define TILT_ROLL_MAX     2000
+  #define TILT_ROLL_MIDDLE  1500
+  #define TILT_ROLL_PROP    10
+//#define TILT_ROLL_AUX_CH  AUX4    //AUX channel to overwrite CAM Roll (AUX1-AUX4), comment to disable manual input and free the AUX channel
+
+  /* if you want to preset min/middle/max values for servos right after flashing, because of limited physical
+   * room for servo travel, then you must enable and set all three following options */
+  #define SERVO_MIN { 700, 1000, 1020, 1020, 1020, 1020, 1020, 1020}
+  #define SERVO_MAX {2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000}
+  #define SERVO_MID {1350, 1500, 1500, 1500, 1500, 1500, 1500, 1500} // (*)
+
+
+// SONAR
+  /* Generic sonar: hc-sr04, srf04, dyp-me007, all generic sonar with echo/pulse pin
+     default pulse is PH6/12, echo is PB4/11
+  */
+  #define SONAR_GENERIC_ECHOPULSE
+  #define SONAR_GENERIC_SCALE       58 //scale for ranging conversion (hcsr04 is 58)
+  #define SONAR_GENERIC_MAX_RANGE   400 //cm (could be more)
+
+  /************************* Sonar alt hold / precision / ground collision keeper *******/
+  //#define SONAR_TILT_CORRECTION //correct ranging from quad inclinaison, may works or not, depends of beam shape, ultrasonic absorption, sensibility of environnement, etc...
+  //will not be applyed if hypo is longer than max range of course and no more than 30/40째 correction
+
+  #define SONAR_MAX_HOLD 380 //cm, kind of error delimiter, for now to avoid rocket climbing, only usefull if no baro
+
+  //if using baro + sonar
+  #define SONAR_BARO_FUSION_LC 250 //cm, baro/sonar readings fusion, low cut, below = full sonar
+  #define SONAR_BARO_FUSION_HC 300 //cm, baro/sonar readings fusion, high cut, above = full baro
+  #define SONAR_BARO_FUSION_RATIO 0.0 //0.0-1.0,  baro/sonar readings fusion, amount of each sensor value, 0 = proportionnel between LC and HC
+  #define SONAR_BARO_LPF_LC 0.9f
+  #define SONAR_BARO_LPF_HC 0.9f
+#endif
+
+#if defined(SONAR_GENERIC_ECHOPULSE)
+  #define SONAR_GEP_TriggerPin             12
+  #define SONAR_GEP_TriggerPin_PINMODE_OUT pinMode(SONAR_GEP_TriggerPin,OUTPUT);
+  #define SONAR_GEP_TriggerPin_PIN_HIGH    PORTB |= 1<<6;
+  #define SONAR_GEP_TriggerPin_PIN_LOW     PORTB &= ~(1<<6);
+  #define SONAR_GEP_EchoPin                11
+  #define SONAR_GEP_EchoPin_PINMODE_IN     pinMode(SONAR_GEP_EchoPin,INPUT);
+  #define SONAR_GEP_EchoPin_PCINT          PCINT5
+  #define SONAR_GEP_EchoPin_PCICR          PCICR |= (1<<PCIE0); // PCINT 0-7 belong to PCIE0
+  #define SONAR_GEP_EchoPin_PCMSK          PCMSK0 = (1<<SONAR_GEP_EchoPin_PCINT); // Mask Pin PCINT5 - all other PIns PCINT0-7 are not allowed to create interrupts!
+  #define SONAR_GEP_EchoPin_PCINT_vect     PCINT0_vect  // PCINT0-7 belog PCINT0_vect
+  #define SONAR_GEP_EchoPin_PIN            PINB  // PCINT0-7 belong to PINB
+#endif
+
 #if COPTERTEST == 1
   #define QUADP
   #define WMP
@@ -1627,7 +1731,7 @@
   #define GPS 0
 #endif
 
-#if defined(SRF02) || defined(SRF08) || defined(SRF10) || defined(SRC235) || defined(I2C_GPS_SONAR)
+#if defined(SRF02) || defined(SRF08) || defined(SRF10) || defined(SRC235) || defined(I2C_GPS_SONAR) || defined(SONAR_GENERIC_ECHOPULSE)
   #define SONAR 1
 #else
   #define SONAR 0

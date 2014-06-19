@@ -49,7 +49,7 @@ const char boxnames[] PROGMEM = // names for dynamic generation of config GUI
     "ANGLE;"
     "HORIZON;"
   #endif
-  #if BARO && (!defined(SUPPRESS_BARO_ALTHOLD))
+  #if (defined(BARO) || defined(SONAR)) && (!defined(SUPPRESS_BARO_ALTHOLD))
     "BARO;"
   #endif
   #ifdef VARIOMETER
@@ -57,6 +57,10 @@ const char boxnames[] PROGMEM = // names for dynamic generation of config GUI
   #endif
   #if MAG
     "MAG;"
+  #else
+    "HEADHOLD;"
+  #endif
+  #if defined(HEADFREE)
     "HEADFREE;"
     "HEADADJ;"  
   #endif
@@ -100,7 +104,7 @@ const uint8_t boxids[] PROGMEM = {// permanent IDs associated to boxes. This way
     1, //"ANGLE;"
     2, //"HORIZON;"
   #endif
-  #if BARO && (!defined(SUPPRESS_BARO_ALTHOLD))
+  #if (defined(BARO) || defined(SONAR)) && (!defined(SUPPRESS_BARO_ALTHOLD))
     3, //"BARO;"
   #endif
   #ifdef VARIOMETER
@@ -108,6 +112,10 @@ const uint8_t boxids[] PROGMEM = {// permanent IDs associated to boxes. This way
   #endif
   #if MAG
     5, //"MAG;"
+  #else
+    5, //"HEADHOLD"
+  #endif
+  #if defined(HEADFREE)
     6, //"HEADFREE;"
     7, //"HEADADJ;"  
   #endif
@@ -159,6 +167,7 @@ int32_t  AltHold; // in cm
 int16_t  sonarAlt;
 int16_t  BaroPID = 0;
 int16_t  errorAltitudeI = 0;
+int32_t  BaroHome=0;
 
 // **************
 // gyro+acc IMU
@@ -366,6 +375,7 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
   tmp2 = tmp/256; // range [0;9]
   rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp-tmp2*256) * (lookupThrottleRC[tmp2+1]-lookupThrottleRC[tmp2]) / 256; // [0;2559] -> expo -> [conf.minthrottle;MAXTHROTTLE]
 
+#if defined(HEADFREE)
   if(f.HEADFREE_MODE) { //to optimize
     float radDiff = (att.heading - headFreeModeHold) * 0.0174533f; // where PI/180 ~= 0.0174533
     float cosDiff = cos(radDiff);
@@ -374,6 +384,7 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
     rcCommand[ROLL] =  rcCommand[ROLL]*cosDiff - rcCommand[PITCH]*sinDiff; 
     rcCommand[PITCH] = rcCommand_PITCH;
   }
+#endif
 
   // query at most one multiplexed analog channel per MWii cycle
   static uint8_t analogReader =0;
@@ -703,7 +714,9 @@ void go_arm() {
     ) {
     if(!f.ARMED && !f.BARO_MODE) { // arm now!
       f.ARMED = 1;
+  #if defined(HEADFREE)
       headFreeModeHold = att.heading;
+  #endif
       magHold = att.heading;
       #if defined(VBAT)
         if (analog.vbat > NO_VBAT) vbatMin = analog.vbat;
@@ -988,7 +1001,7 @@ void loop () {
       if (f.ANGLE_MODE || f.HORIZON_MODE) {STABLEPIN_ON;} else {STABLEPIN_OFF;}
     #endif
 
-    #if BARO
+    #if (defined(BARO) || defined(SONAR))
       #if (!defined(SUPPRESS_BARO_ALTHOLD))
         if (rcOptions[BOXBARO]) {
           if (!f.BARO_MODE) {
@@ -1025,6 +1038,7 @@ void loop () {
       } else {
         f.MAG_MODE = 0;
       }
+      #if defined(HEADFREE)
       if (rcOptions[BOXHEADFREE]) {
         if (!f.HEADFREE_MODE) {
           f.HEADFREE_MODE = 1;
@@ -1039,6 +1053,16 @@ void loop () {
       }
       if (rcOptions[BOXHEADADJ]) {
         headFreeModeHold = att.heading; // acquire new heading
+      }
+    #endif
+    #else
+      if (rcOptions[BOXHEADHOLD]) {
+        if (!f.MAG_MODE) {
+          f.MAG_MODE = 1;
+          magHold = att.heading;
+        }
+      } else {
+        f.MAG_MODE = 0;
       }
     #endif
     
@@ -1159,16 +1183,17 @@ void loop () {
 
  //*********************************** 
  
-  #if MAG
+  //#if MAG
+  // common for MAG and HEADHOLD without MAG
     if (abs(rcCommand[YAW]) <70 && f.MAG_MODE) {
       int16_t dif = att.heading - magHold;
       if (dif <= - 180) dif += 360;
       if (dif >= + 180) dif -= 360;
       if ( f.SMALL_ANGLES_25 ) rcCommand[YAW] -= dif*conf.pid[PIDMAG].P8>>5;
     } else magHold = att.heading;
-  #endif
+  //#endif
 
-  #if BARO && (!defined(SUPPRESS_BARO_ALTHOLD))
+  #if (defined(BARO) || defined(SONAR)) && (!defined(SUPPRESS_BARO_ALTHOLD))
     /* Smooth alt change routine , for slow auto and aerophoto modes (in general solution from alexmos). It's slowly increase/decrease 
      * altitude proportional to stick movement (+/-100 throttle gives about +/-50 cm in 1 second with cycle time about 3-4ms)
      */

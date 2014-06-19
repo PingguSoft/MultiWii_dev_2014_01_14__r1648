@@ -36,7 +36,7 @@ enum box {
     BOXANGLE,
     BOXHORIZON,
   #endif
-  #if BARO && (!defined(SUPPRESS_BARO_ALTHOLD))
+  #if (defined(BARO)  || defined(SONAR)) && (!defined(SUPPRESS_BARO_ALTHOLD))
     BOXBARO,
   #endif
   #ifdef VARIOMETER
@@ -46,6 +46,8 @@ enum box {
     BOXMAG,
     BOXHEADFREE,
     BOXHEADADJ, // acquire heading for HEADFREE mode
+  #else
+    BOXHEADHOLD,
   #endif
   #if defined(SERVO_TILT) || defined(GIMBAL)  || defined(SERVO_MIX_TILT)
     BOXCAMSTAB,

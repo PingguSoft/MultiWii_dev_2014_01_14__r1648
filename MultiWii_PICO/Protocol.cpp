@@ -375,15 +375,19 @@ void evaluateCommand() {
        if(f.ANGLE_MODE)   tmp |= 1<<BOXANGLE;
        if(f.HORIZON_MODE) tmp |= 1<<BOXHORIZON;
      #endif
-     #if BARO && (!defined(SUPPRESS_BARO_ALTHOLD))
+     #if (defined(BARO) || defined(SONAR)) && (!defined(SUPPRESS_BARO_ALTHOLD))
        if(f.BARO_MODE) tmp |= 1<<BOXBARO;
      #endif
      #if MAG
        if(f.MAG_MODE) tmp |= 1<<BOXMAG;
        #if !defined(FIXEDWING)
-         if(f.HEADFREE_MODE)       tmp |= 1<<BOXHEADFREE;
-         if(rcOptions[BOXHEADADJ]) tmp |= 1<<BOXHEADADJ;
+         #if defined(HEADFREE)
+           if(f.HEADFREE_MODE)       tmp |= 1<<BOXHEADFREE;
+           if(rcOptions[BOXHEADADJ]) tmp |= 1<<BOXHEADADJ;
+         #endif
        #endif
+     #else
+       if(f.MAG_MODE) tmp |= 1<<BOXHEADHOLD;
      #endif
      #if defined(SERVO_TILT) || defined(GIMBAL)|| defined(SERVO_MIX_TILT)
        if(rcOptions[BOXCAMSTAB]) tmp |= 1<<BOXCAMSTAB;

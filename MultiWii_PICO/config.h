@@ -155,6 +155,7 @@
       //#define MultiWii_32U4_SE_no_baro // Hextronik MultiWii_32U4_SE without the MS561101BA for more free flash-memory
       //#define Flyduino9DOF       // Flyduino 9DOF IMU MPU6050+HMC5883l
       //#define Nano_Plane         // Multiwii Plane version with tail-front LSM330 sensor http://www.radiosait.ru/en/page_5324.html
+      #define INTERBOARD_PICO_MULTIWII
       
     /***************************    independent sensors    ********************************/
       /* leave it commented if you already checked a specific board above */

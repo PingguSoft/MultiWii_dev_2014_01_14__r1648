@@ -1758,6 +1758,59 @@ void Sonar_update() {
   } 
 sonarAlt = srf08_ctx.range[0]; //tmp
 }
+
+#elif defined(SONAR_GENERIC_ECHOPULSE)
+
+volatile unsigned long SONAR_GEP_startTime = 0;
+volatile unsigned long SONAR_GEP_echoTime = 0;
+volatile static int32_t  tempSonarAlt=0;
+static unsigned long lastPing = 0;
+
+void Sonar_update()
+{
+  long diffEcho = micros() - SONAR_GEP_startTime;
+  long diffPing = millis() - lastPing;
+
+  if (diffEcho >= SONAR_GENERIC_MAX_RANGE * SONAR_GENERIC_SCALE)
+    sonarAlt = -1;
+  else
+    sonarAlt=tempSonarAlt;
+
+  if (diffPing > 60) {
+    /*static int32_t sonarTempDistance=0;
+    sonarTempDistance = (sonarTempDistance - (sonarTempDistance >> 3)) + sonarAlt;
+    sonarAlt= sonarTempDistance >> 3;*/
+    SONAR_GEP_TriggerPin_PIN_LOW;
+    delayMicroseconds(2);
+    SONAR_GEP_TriggerPin_PIN_HIGH;
+    delayMicroseconds(10);
+    SONAR_GEP_TriggerPin_PIN_LOW;
+    lastPing = millis();
+  }
+}
+
+void Sonar_init()
+{
+  SONAR_GEP_EchoPin_PCICR;
+  SONAR_GEP_EchoPin_PCMSK;
+  SONAR_GEP_EchoPin_PINMODE_IN;
+  SONAR_GEP_TriggerPin_PINMODE_OUT;
+  Sonar_update();
+}
+
+ISR(SONAR_GEP_EchoPin_PCINT_vect) {
+  if (SONAR_GEP_EchoPin_PIN & (1<<SONAR_GEP_EchoPin_PCINT)) {
+    SONAR_GEP_startTime = micros();
+  }
+  else {
+    SONAR_GEP_echoTime = micros() - SONAR_GEP_startTime;
+    if (SONAR_GEP_echoTime <= SONAR_GENERIC_MAX_RANGE*SONAR_GENERIC_SCALE)
+      tempSonarAlt = SONAR_GEP_echoTime / SONAR_GENERIC_SCALE;
+    else
+      tempSonarAlt = -1;
+  }
+}
+
 #else
 inline void Sonar_init() {}
 void Sonar_update() {}
