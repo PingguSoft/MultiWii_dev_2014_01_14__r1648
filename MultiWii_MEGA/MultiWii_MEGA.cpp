@@ -49,7 +49,7 @@ const char boxnames[] PROGMEM = // names for dynamic generation of config GUI
     "ANGLE;"
     "HORIZON;"
   #endif
-  #if (defined(BARO) || defined(SONAR)) && (!defined(SUPPRESS_BARO_ALTHOLD))
+  #if (BARO || SONAR) && (!defined(SUPPRESS_BARO_ALTHOLD))
     "BARO;"
   #endif
   #ifdef VARIOMETER
@@ -57,12 +57,10 @@ const char boxnames[] PROGMEM = // names for dynamic generation of config GUI
   #endif
   #if MAG
     "MAG;"
+    "HEADFREE;"
+    "HEADADJ;"
   #else
     "HEADHOLD;"
-  #endif
-  #if defined(HEADFREE)
-    "HEADFREE;"
-    "HEADADJ;"  
   #endif
   #if defined(SERVO_TILT) || defined(GIMBAL)|| defined(SERVO_MIX_TILT)
     "CAMSTAB;"
@@ -104,7 +102,7 @@ const uint8_t boxids[] PROGMEM = {// permanent IDs associated to boxes. This way
     1, //"ANGLE;"
     2, //"HORIZON;"
   #endif
-  #if (defined(BARO) || defined(SONAR)) && (!defined(SUPPRESS_BARO_ALTHOLD))
+  #if (BARO || SONAR) && (!defined(SUPPRESS_BARO_ALTHOLD))
     3, //"BARO;"
   #endif
   #ifdef VARIOMETER
@@ -112,12 +110,10 @@ const uint8_t boxids[] PROGMEM = {// permanent IDs associated to boxes. This way
   #endif
   #if MAG
     5, //"MAG;"
+    6, //"HEADFREE;"
+    7, //"HEADADJ;"
   #else
     5, //"HEADHOLD"
-  #endif
-  #if defined(HEADFREE)
-    6, //"HEADFREE;"
-    7, //"HEADADJ;"  
   #endif
   #if defined(SERVO_TILT) || defined(GIMBAL)|| defined(SERVO_MIX_TILT)
     8, //"CAMSTAB;"
@@ -375,7 +371,7 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
   tmp2 = tmp/256; // range [0;9]
   rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp-tmp2*256) * (lookupThrottleRC[tmp2+1]-lookupThrottleRC[tmp2]) / 256; // [0;2559] -> expo -> [conf.minthrottle;MAXTHROTTLE]
 
-#if defined(HEADFREE)
+//#if defined(HEADFREE)
   if(f.HEADFREE_MODE) { //to optimize
     float radDiff = (att.heading - headFreeModeHold) * 0.0174533f; // where PI/180 ~= 0.0174533
     float cosDiff = cos(radDiff);
@@ -384,7 +380,7 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
     rcCommand[ROLL] =  rcCommand[ROLL]*cosDiff - rcCommand[PITCH]*sinDiff; 
     rcCommand[PITCH] = rcCommand_PITCH;
   }
-#endif
+//#endif
 
   // query at most one multiplexed analog channel per MWii cycle
   static uint8_t analogReader =0;
@@ -714,9 +710,9 @@ void go_arm() {
     ) {
     if(!f.ARMED && !f.BARO_MODE) { // arm now!
       f.ARMED = 1;
-  #if defined(HEADFREE)
+//  #if defined(HEADFREE)
       headFreeModeHold = att.heading;
-  #endif
+//  #endif
       magHold = att.heading;
       #if defined(VBAT)
         if (analog.vbat > NO_VBAT) vbatMin = analog.vbat;
@@ -1001,7 +997,7 @@ void loop () {
       if (f.ANGLE_MODE || f.HORIZON_MODE) {STABLEPIN_ON;} else {STABLEPIN_OFF;}
     #endif
 
-    #if (defined(BARO) || defined(SONAR))
+    #if BARO || SONAR
       #if (!defined(SUPPRESS_BARO_ALTHOLD))
         if (rcOptions[BOXBARO]) {
           if (!f.BARO_MODE) {
@@ -1038,7 +1034,6 @@ void loop () {
       } else {
         f.MAG_MODE = 0;
       }
-      #if defined(HEADFREE)
       if (rcOptions[BOXHEADFREE]) {
         if (!f.HEADFREE_MODE) {
           f.HEADFREE_MODE = 1;
@@ -1054,7 +1049,6 @@ void loop () {
       if (rcOptions[BOXHEADADJ]) {
         headFreeModeHold = att.heading; // acquire new heading
       }
-    #endif
     #else
       if (rcOptions[BOXHEADHOLD]) {
         if (!f.MAG_MODE) {
@@ -1135,7 +1129,7 @@ void loop () {
         #endif
       case 2:
         taskOrder++;
-        #if BARO
+        #if BARO || SONAR
           if (getEstimatedAltitude() !=0) break; // 280 us
         #endif    
       case 3:
@@ -1193,8 +1187,8 @@ void loop () {
     } else magHold = att.heading;
   //#endif
 
-  #if (defined(BARO) || defined(SONAR)) && (!defined(SUPPRESS_BARO_ALTHOLD))
-    /* Smooth alt change routine , for slow auto and aerophoto modes (in general solution from alexmos). It's slowly increase/decrease 
+  #if (BARO || SONAR) && (!defined(SUPPRESS_BARO_ALTHOLD))
+    /* Smooth alt change routine , for slow auto and aerophoto modes (in general solution from alexmos). It's slowly increase/decrease
      * altitude proportional to stick movement (+/-100 throttle gives about +/-50 cm in 1 second with cycle time about 3-4ms)
      */
     if (f.BARO_MODE) {
