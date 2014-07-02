@@ -9,7 +9,7 @@
   #define I2C_SPEED 400000L
   #define MPU6050       //combo + ACC
   #define MPU6050_LPF_42HZ
-  #define HMC5883
+//  #define HMC5883
   #define FORCE_ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  =  Y; imu.accADC[PITCH]  = -X; imu.accADC[YAW]  = Z;}
   #define FORCE_GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] =  X; imu.gyroADC[PITCH] =  Y; imu.gyroADC[YAW] = -Z;}
   #define FORCE_MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  = -X; imu.magADC[PITCH]  = -Y; imu.magADC[YAW]  = -Z;}
@@ -23,24 +23,27 @@
        vbat = [0;1023]*16/VBATSCALE
        must be associated with #define BUZZER ! */
   #define VBAT
-  #define VBATSCALE       150 // (*) change this value if readed Battery voltage is different than real voltage
-  #define VBATNOMINAL     126 // 12,6V full battery nominal voltage - only used for lcd.telemetry
-  #define VBATLEVEL_WARN1 65 // (*) 10,7V
-  #define VBATLEVEL_WARN2  55 // (*) 9.9V
-  #define VBATLEVEL_CRIT   45 // (*) 9.3V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
-  #define NO_VBAT          10  // (*) Avoid beeping without any battery
+  #define VBATSCALE         99 // (*) change this value if readed Battery voltage is different than real voltage
+  #define VBATNOMINAL       126 // 12,6V full battery nominal voltage - only used for lcd.telemetry
+  #define VBATLEVEL_WARN1   105 // (*) 10,5V
+  #define VBATLEVEL_WARN2   100 // (*) 10.0V
+  #define VBATLEVEL_CRIT    93 //  (*) 9.3V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
+  #define NO_VBAT           10  // (*) Avoid beeping without any battery
 
   #define EXT_MOTOR_RANGE
   #define MOTOR_STOP
-  #define DEADBAND 24
+//  #define DEADBAND 24
 
+  #undef  SERIAL0_COM_SPEED
+  #define SERIAL0_COM_SPEED 57600
 
+  #define ZIGBEE_PROBEE_ZE20S   1
 #if 1
   // SONAR
   /* Generic sonar: hc-sr04, srf04, dyp-me007, all generic sonar with echo/pulse pin
      default pulse is PH6/12, echo is PB4/11
   */
-  #define SONAR_GENERIC_ECHOPULSE
+//  #define SONAR_GENERIC_ECHOPULSE
   #define SONAR_GENERIC_SCALE       58 //scale for ranging conversion (hcsr04 is 58)
   #define SONAR_GENERIC_MAX_RANGE   400 //cm (could be more)
 

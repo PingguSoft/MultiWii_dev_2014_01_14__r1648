@@ -15,6 +15,10 @@
 // Multiwii Serial Protocol 0
 #define MSP_VERSION              0
 
+#if ZIGBEE_PROBEE_ZE20S
+#define MSP_SET_ZIGBEE           97    //
+#endif
+
 //to multiwii developpers/committers : do not add new MSP messages without a proper argumentation/agreement on the forum
 #define MSP_IDENT                100   //out message         multitype + multiwii version + protocol version + capability variable
 #define MSP_STATUS               101   //out message         cycletime & errors_count & sensor present & box activation & current setting number
@@ -52,7 +56,6 @@
 #define MSP_SET_HEAD             211   //in message          define a new heading hold direction
 #define MSP_SET_SERVO_CONF       212   //in message          Servo settings
 #define MSP_SET_MOTOR            214   //in message          PropBalance function
-
 #define MSP_BIND                 240   //in message          no param
 
 #define MSP_EEPROM_WRITE         250   //in message          no param
@@ -243,6 +246,14 @@ void evaluateCommand() {
   uint32_t tmp=0;
 
   switch(cmdMSP[CURRENTPORT]) {
+#if ZIGBEE_PROBEE_ZE20S
+  case MSP_SET_ZIGBEE:
+    headSerialReply(0x20);
+    for (tmp = 0; tmp < 0x20; tmp++)
+      serialize8(0x20);
+    break;
+#endif
+
    case MSP_SET_RAW_RC:
      s_struct_w((uint8_t*)&rcSerial,16);
      rcSerialCount = 50; // 1s transition
@@ -590,6 +601,15 @@ void evaluateCommand() {
      break;
   }
   tailSerialReply();
+
+#if ZIGBEE_PROBEE_ZE20S
+  if (cmdMSP[CURRENTPORT] == MSP_SET_ZIGBEE) {
+    serialize8('a');
+    serialize8('t');
+    serialize8('d');
+    serialize8(0x0D);
+  }
+#endif
 }
 #endif // SUPPRESS_ALL_SERIAL_MSP
 
