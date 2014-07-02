@@ -248,9 +248,16 @@ void evaluateCommand() {
   switch(cmdMSP[CURRENTPORT]) {
 #if ZIGBEE_PROBEE_ZE20S
   case MSP_SET_ZIGBEE:
-    headSerialReply(0x20);
-    for (tmp = 0; tmp < 0x20; tmp++)
-      serialize8(0x20);
+    SerialSerialize(CURRENTPORT, 'a');
+    SerialSerialize(CURRENTPORT, 't');
+    SerialSerialize(CURRENTPORT, 0x0D);
+
+    SerialSerialize(CURRENTPORT, 'a');
+    SerialSerialize(CURRENTPORT, 't');
+    SerialSerialize(CURRENTPORT, 'd');
+    SerialSerialize(CURRENTPORT, 0x0D);
+
+    headSerialReply(0);
     break;
 #endif
 
@@ -601,15 +608,6 @@ void evaluateCommand() {
      break;
   }
   tailSerialReply();
-
-#if ZIGBEE_PROBEE_ZE20S
-  if (cmdMSP[CURRENTPORT] == MSP_SET_ZIGBEE) {
-    serialize8('a');
-    serialize8('t');
-    serialize8('d');
-    serialize8(0x0D);
-  }
-#endif
 }
 #endif // SUPPRESS_ALL_SERIAL_MSP
 
