@@ -674,7 +674,13 @@ void initOutput() {
   #if defined(ESC_CALIB_CANNOT_FLY)
     writeAllMotors(ESC_CALIB_HIGH);
     blinkLED(2,20, 2);
-    delay(4000);
+    delay(4000);    // throttle cal  : 4000
+    //delay(10000);   // break setting : 10000
+    //delay(17000);   // nicad setting : 17000
+    //delay(23000);   // LiPo setting  : 23000
+    //delay(30000);   // cutoff low    : 30000
+    //delay(62000);   // restore
+    //delay(163000);   // 16KHz
     writeAllMotors(ESC_CALIB_LOW);
     blinkLED(3,20, 2);
     while (1) {
