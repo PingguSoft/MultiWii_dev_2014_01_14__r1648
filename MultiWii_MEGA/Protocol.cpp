@@ -76,7 +76,7 @@
 
 static uint8_t CURRENTPORT=0;
 
-#define INBUF_SIZE 64
+#define INBUF_SIZE 128
 static uint8_t inBuf[INBUF_SIZE][UART_NUMBER];
 static uint8_t checksum[UART_NUMBER];
 static uint8_t indRX[UART_NUMBER];
