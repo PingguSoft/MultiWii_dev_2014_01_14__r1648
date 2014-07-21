@@ -13,7 +13,6 @@
   #define FORCE_ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  =  Y; imu.accADC[PITCH]  = -X; imu.accADC[YAW]  = Z;}
   #define FORCE_GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] =  X; imu.gyroADC[PITCH] =  Y; imu.gyroADC[YAW] = -Z;}
   #define FORCE_MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  = -X; imu.magADC[PITCH]  = -Y; imu.magADC[YAW]  = -Z;}
-  #define FAILSAFE
   #define BUZZER
 //  #define RCAUXPIN12
 
@@ -36,6 +35,11 @@
 
   #undef  SERIAL0_COM_SPEED
   #define SERIAL0_COM_SPEED 57600
+
+  #define FAILSAFE
+  #define FAILSAFE_DELAY     10                     // Guard time for failsafe activation after signal lost. 1 step = 0.1sec - 1sec in example
+  #define FAILSAFE_OFF_DELAY 100                    // Time for Landing before motors stop in 0.1sec. 1 step = 0.1sec - 10sec in example
+  #define FAILSAFE_THROTTLE  1000                   // (*) Throttle level used for landing - may be relative to MINTHROTTLE - as in this case
 
   #define ZIGBEE_PROBEE_ZE20S   1
 #if 1
