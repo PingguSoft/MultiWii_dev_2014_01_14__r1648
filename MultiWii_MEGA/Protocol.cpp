@@ -15,10 +15,6 @@
 // Multiwii Serial Protocol 0
 #define MSP_VERSION              0
 
-#if ZIGBEE_PROBEE_ZE20S
-#define MSP_SET_ZIGBEE           97    //
-#endif
-#define MSP_TX_GPS_DATA          98    //
 
 //to multiwii developpers/committers : do not add new MSP messages without a proper argumentation/agreement on the forum
 #define MSP_IDENT                100   //out message         multitype + multiwii version + protocol version + capability variable
@@ -57,6 +53,8 @@
 #define MSP_SET_HEAD             211   //in message          define a new heading hold direction
 #define MSP_SET_SERVO_CONF       212   //in message          Servo settings
 #define MSP_SET_MOTOR            214   //in message          PropBalance function
+
+#define MSP_TX_GPS_DATA          215   //in message          AGPS injection
 
 #define MSP_BIND                 240   //in message          no param
 
@@ -249,25 +247,11 @@ void evaluateCommand(uint8_t len) {
 
   switch(cmdMSP[CURRENTPORT]) {
 
-#if ZIGBEE_PROBEE_ZE20S
-  case MSP_SET_ZIGBEE:
-    SerialSerialize(CURRENTPORT, 'a');
-    SerialSerialize(CURRENTPORT, 't');
-    SerialSerialize(CURRENTPORT, 0x0D);
-
-    SerialSerialize(CURRENTPORT, 'a');
-    SerialSerialize(CURRENTPORT, 't');
-    SerialSerialize(CURRENTPORT, 'd');
-    SerialSerialize(CURRENTPORT, 0x0D);
-
-    headSerialReply(0);
-    break;
-#endif
-
 #if GPS
    case MSP_TX_GPS_DATA:
      for (uint8_t i = 0; i < len; i++) {
        SerialWrite(GPS_SERIAL, read8());
+       delay(5); //simulating a 38400baud pace (or less), otherwise commands are not accepted by the device.
      }
      headSerialReply(0);
      break;
