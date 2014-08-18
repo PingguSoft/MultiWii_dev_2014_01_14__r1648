@@ -15,9 +15,6 @@
 // Multiwii Serial Protocol 0
 #define MSP_VERSION              0
 
-#if ZIGBEE_PROBEE_ZE20S
-#define MSP_SET_ZIGBEE           97    //
-#endif
 #define MSP_TX_GPS_DATA          98    //
 
 //to multiwii developpers/committers : do not add new MSP messages without a proper argumentation/agreement on the forum
@@ -248,21 +245,6 @@ void evaluateCommand(uint8_t len) {
   uint32_t tmp=0;
 
   switch(cmdMSP[CURRENTPORT]) {
-
-#if ZIGBEE_PROBEE_ZE20S
-  case MSP_SET_ZIGBEE:
-    SerialSerialize(CURRENTPORT, 'a');
-    SerialSerialize(CURRENTPORT, 't');
-    SerialSerialize(CURRENTPORT, 0x0D);
-
-    SerialSerialize(CURRENTPORT, 'a');
-    SerialSerialize(CURRENTPORT, 't');
-    SerialSerialize(CURRENTPORT, 'd');
-    SerialSerialize(CURRENTPORT, 0x0D);
-
-    headSerialReply(0);
-    break;
-#endif
 
 #if GPS
    case MSP_TX_GPS_DATA:

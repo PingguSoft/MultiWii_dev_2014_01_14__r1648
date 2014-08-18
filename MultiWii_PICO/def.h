@@ -9,12 +9,12 @@
   #define I2C_SPEED 400000L
   #define MPU6050       //combo + ACC
   #define MPU6050_LPF_42HZ
-//  #define HMC5883
+  #define HMC5883     // magnetor
+  #define BMP085      // barometer
   #define FORCE_ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  =  Y; imu.accADC[PITCH]  = -X; imu.accADC[YAW]  = Z;}
   #define FORCE_GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] =  X; imu.gyroADC[PITCH] =  Y; imu.gyroADC[YAW] = -Z;}
-  #define FORCE_MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  = -X; imu.magADC[PITCH]  = -Y; imu.magADC[YAW]  = -Z;}
+  #define FORCE_MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  =  Y; imu.magADC[PITCH]  =  X; imu.magADC[YAW]  = Z;}
   #define BUZZER
-//  #define RCAUXPIN12
 
     /* for V BAT monitoring
        after the resistor divisor we should get [0V;5V]->[0;1023] on analog V_BATPIN
@@ -31,7 +31,7 @@
 
   #define EXT_MOTOR_RANGE
   #define MOTOR_STOP
-//  #define DEADBAND 24
+  #define DEADBAND 24
 
   #undef  SERIAL0_COM_SPEED
   #define SERIAL0_COM_SPEED 57600
@@ -40,14 +40,19 @@
   #define FAILSAFE_DELAY     10                     // Guard time for failsafe activation after signal lost. 1 step = 0.1sec - 1sec in example
   #define FAILSAFE_OFF_DELAY 100                    // Time for Landing before motors stop in 0.1sec. 1 step = 0.1sec - 10sec in example
   #define FAILSAFE_THROTTLE  1000                   // (*) Throttle level used for landing - may be relative to MINTHROTTLE - as in this case
+  #define MINTHROTTLE 1000
+  #define MAXTHROTTLE 2000
 
-  #define ZIGBEE_PROBEE_ZE20S   1
-#if 1
+  #define SERIAL_RECEIVER_ONLY  1
+
   // SONAR
   /* Generic sonar: hc-sr04, srf04, dyp-me007, all generic sonar with echo/pulse pin
      default pulse is PH6/12, echo is PB4/11
   */
 //  #define SONAR_GENERIC_ECHOPULSE
+
+
+#if defined(SONAR_GENERIC_ECHOPULSE)
   #define SONAR_GENERIC_SCALE       58 //scale for ranging conversion (hcsr04 is 58)
   #define SONAR_GENERIC_MAX_RANGE   400 //cm (could be more)
 
@@ -63,9 +68,7 @@
   #define SONAR_BARO_FUSION_RATIO 0.0 //0.0-1.0,  baro/sonar readings fusion, amount of each sensor value, 0 = proportionnel between LC and HC
   #define SONAR_BARO_LPF_LC 0.6f
   #define SONAR_BARO_LPF_HC 0.9f
-#endif
 
-#if defined(SONAR_GENERIC_ECHOPULSE)
   #define SONAR_GEP_TriggerPin             12
   #define SONAR_GEP_TriggerPin_PINMODE_OUT pinMode(SONAR_GEP_TriggerPin,OUTPUT);
   #define SONAR_GEP_TriggerPin_PIN_HIGH    PORTB |= 1<<4;
