@@ -44,6 +44,12 @@
   #define MAXTHROTTLE 2000
 
   #define SERIAL_RECEIVER_ONLY  1
+  #define REVERSE_LED           1
+
+  #define CAM_SYMA_PIN          12
+  #define CAM_SYMA_PIN_PINMODE_OUT pinMode(CAM_SYMA_PIN,OUTPUT);
+  #define CAM_SYMA_PIN_HIGH     PORTB |= 1<<4;
+  #define CAM_SYMA_PIN_LOW      PORTB &= ~(1<<4);
 
   // SONAR
   /* Generic sonar: hc-sr04, srf04, dyp-me007, all generic sonar with echo/pulse pin
@@ -336,8 +342,13 @@
   #if !defined(MONGOOSE1_0)
     #define LEDPIN_PINMODE             pinMode (13, OUTPUT);
     #define LEDPIN_TOGGLE              PINB |= 1<<5;     //switch LEDPIN state (digital PIN 13)
-    #define LEDPIN_OFF                 PORTB &= ~(1<<5);
-    #define LEDPIN_ON                  PORTB |= (1<<5);
+    #ifdef REVERSE_LED
+      #define LEDPIN_OFF                 PORTB |= (1<<5);
+      #define LEDPIN_ON                  PORTB &= ~(1<<5);
+    #else
+      #define LEDPIN_OFF                 PORTB &= ~(1<<5);
+      #define LEDPIN_ON                  PORTB |= (1<<5);
+    #endif
   #endif
   #if !defined(RCAUXPIN8)
     #if !defined(MONGOOSE1_0)
@@ -350,8 +361,13 @@
         #undef PILOTLAMP
       #endif
       #if defined PILOTLAMP && NUMBER_MOTOR <5
-        #define    PL_PIN_ON            PORTB |= 1;
-        #define    PL_PIN_OFF           PORTB &= ~1;
+        #ifdef REVERSE_LED
+          #define    PL_PIN_ON            PORTB &= ~1;
+          #define    PL_PIN_OFF           PORTB |= 1;
+        #else
+          #define    PL_PIN_ON            PORTB |= 1;
+          #define    PL_PIN_OFF           PORTB &= ~1;
+        #endif
       #else
         #if defined(INTERBOARD_PICO_MULTIWII)
           #define BUZZERPIN_ON            PORTC |= 1;

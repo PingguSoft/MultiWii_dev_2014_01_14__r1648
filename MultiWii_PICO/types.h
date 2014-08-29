@@ -81,6 +81,10 @@ enum box {
   #ifdef OSD_SWITCH
     BOXOSD,
   #endif
+  #ifdef CAM_SYMA_PIN
+    BOXSYMASHOT,
+    BOXSYMACAM,
+  #endif
   CHECKBOXITEMS
 };
 
@@ -127,7 +131,12 @@ typedef struct {
   uint8_t GPS_FIX_HOME :1 ;
   uint8_t SMALL_ANGLES_25 :1 ;
   uint8_t CALIBRATE_MAG :1 ;
+
   uint8_t VARIO_MODE :1;
+#ifdef CAM_SYMA_PIN
+  uint8_t SYMA_SHOT :1;
+  uint8_t SYMA_CAM  :1;
+#endif
 } flags_struct_t;
 
 typedef struct {

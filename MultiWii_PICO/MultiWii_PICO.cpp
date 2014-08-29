@@ -94,6 +94,11 @@ const char boxnames[] PROGMEM = // names for dynamic generation of config GUI
   #ifdef OSD_SWITCH
     "OSD SW;"
   #endif
+
+  #ifdef CAM_SYMA_PIN
+    "SYMA SHOT;"
+    "SYMA CAM;"
+  #endif
 ;
 
 const uint8_t boxids[] PROGMEM = {// permanent IDs associated to boxes. This way, you can rely on an ID number to identify a BOX function.
@@ -146,6 +151,10 @@ const uint8_t boxids[] PROGMEM = {// permanent IDs associated to boxes. This way
   #endif
   #ifdef OSD_SWITCH
     19, //"OSD_SWITCH;"
+  #endif
+  #ifdef CAM_SYMA_PIN
+    20, // "SYMA SHOT;"
+    21, // "SYMA CAM;"
   #endif
 };
 
@@ -331,6 +340,16 @@ conf_t conf;
   int32_t baroPressure;
   int16_t baroTemperature;
   int32_t baroPressureSum;
+#endif
+
+#if defined(CAM_SYMA_PIN)
+typedef struct {
+  uint8_t SYMA_SHOT :1 ;
+  uint8_t SYMA_CAM  :1 ;
+} syma_flag_t;
+
+  syma_flag_t syma_f;
+  uint32_t    cam_syma_time = 0;
 #endif
 
 void annexCode() { // this code is excetuted at each loop and won't interfere with control loop if it lasts less than 650 microseconds
@@ -1113,6 +1132,26 @@ void loop () {
       else {f.PASSTHRU_MODE = 0;}
     #endif
 
+    #if defined(CAM_SYMA_PIN)
+      if (syma_f.SYMA_SHOT == 0 && rcOptions[BOXSYMASHOT]) {
+        f.SYMA_SHOT = 1;
+        syma_f.SYMA_SHOT = 1;
+        cam_syma_time   = 0;
+      } else if (syma_f.SYMA_SHOT == 1 && !rcOptions[BOXSYMASHOT]) {
+        f.SYMA_SHOT = 1;
+        syma_f.SYMA_SHOT = 0;
+        cam_syma_time   = 0;
+      } else if (syma_f.SYMA_CAM == 0 && rcOptions[BOXSYMACAM]) {
+        f.SYMA_CAM = 1;
+        syma_f.SYMA_CAM = 1;
+        cam_syma_time   = 0;
+      } else if (syma_f.SYMA_CAM == 1 && !rcOptions[BOXSYMACAM]) {
+        f.SYMA_CAM = 1;
+        syma_f.SYMA_CAM = 0;
+        cam_syma_time   = 0;
+      }
+    #endif
+
   } else { // not in rc loop
     static uint8_t taskOrder=0; // never call all functions in the same loop, to avoid high delay spikes
     if(taskOrder>4) taskOrder-=5;
@@ -1176,6 +1215,29 @@ void loop () {
   #endif
 
  //***********************************
+
+  #if defined(CAM_SYMA_PIN)
+    if (f.SYMA_SHOT) {
+      if (cam_syma_time == 0) {
+        CAM_SYMA_PIN_LOW;
+        cam_syma_time = millis();
+      }
+      if (millis() - cam_syma_time > 220) {
+        f.SYMA_SHOT = 0;
+        CAM_SYMA_PIN_HIGH;
+      }
+    } else if (f.SYMA_CAM) {
+      if (cam_syma_time == 0) {
+        CAM_SYMA_PIN_LOW;
+        cam_syma_time = millis();
+      }
+      if (millis() - cam_syma_time > 720) {
+        f.SYMA_CAM = 0;
+        CAM_SYMA_PIN_HIGH;
+      }
+    }
+  #endif
+
 
   //#if MAG
   // common for MAG and HEADHOLD without MAG

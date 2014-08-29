@@ -1016,6 +1016,8 @@ const char PROGMEM lcd_param_text53 [] = "AUX vario ";
 const char PROGMEM lcd_param_text54 [] = "AUX calib ";
 const char PROGMEM lcd_param_text55 [] = "AUX govern";
 const char PROGMEM lcd_param_text56 [] = "AUX osd   ";
+const char PROGMEM lcd_param_text57 [] = "AUX symash";
+const char PROGMEM lcd_param_text58 [] = "AUX symaca";
 // 53 to 61 reserved
 #endif
 #ifdef HELI_120_CCPM //                  0123456789
@@ -1279,6 +1281,16 @@ PROGMEM const void * const lcd_param_ptr_table [] = {
     &lcd_param_text56, &conf.activate[BOXOSD],&__AUX3,
     &lcd_param_text56, &conf.activate[BOXOSD],&__AUX4,
   #endif
+#endif
+#ifdef CAM_SYMA_PIN
+  &lcd_param_text57, &conf.activate[BOXSYMASHOT],&__AUX1,
+  &lcd_param_text57, &conf.activate[BOXSYMASHOT],&__AUX2,
+  &lcd_param_text57, &conf.activate[BOXSYMASHOT],&__AUX3,
+  &lcd_param_text57, &conf.activate[BOXSYMASHOT],&__AUX4,
+  &lcd_param_text58, &conf.activate[BOXSYMACAM],&__AUX1,
+  &lcd_param_text58, &conf.activate[BOXSYMACAM],&__AUX2,
+  &lcd_param_text58, &conf.activate[BOXSYMACAM],&__AUX3,
+  &lcd_param_text58, &conf.activate[BOXSYMACAM],&__AUX4,
 #endif
 #endif //lcd.conf.aux
 
@@ -1874,6 +1886,11 @@ static char checkboxitemNames[][4] = {
     #ifdef OSD_SWITCH
       "OSD",
     #endif
+    #ifdef CAM_SYMA_PIN
+      "SHT"
+      "CAM"
+    #endif
+
   ""};
 void output_checkboxitems() {
   for (uint8_t i=0; i<CHECKBOXITEMS; i++ ) {
