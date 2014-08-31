@@ -1133,22 +1133,29 @@ void loop () {
     #endif
 
     #if defined(CAM_SYMA_PIN)
-      if (syma_f.SYMA_SHOT == 0 && rcOptions[BOXSYMASHOT]) {
-        f.SYMA_SHOT = 1;
-        syma_f.SYMA_SHOT = 1;
-        cam_syma_time   = 0;
-      } else if (syma_f.SYMA_SHOT == 1 && !rcOptions[BOXSYMASHOT]) {
-        f.SYMA_SHOT = 1;
-        syma_f.SYMA_SHOT = 0;
-        cam_syma_time   = 0;
-      } else if (syma_f.SYMA_CAM == 0 && rcOptions[BOXSYMACAM]) {
-        f.SYMA_CAM = 1;
-        syma_f.SYMA_CAM = 1;
-        cam_syma_time   = 0;
-      } else if (syma_f.SYMA_CAM == 1 && !rcOptions[BOXSYMACAM]) {
-        f.SYMA_CAM = 1;
-        syma_f.SYMA_CAM = 0;
-        cam_syma_time   = 0;
+      if (f.SYMA_SHOT == 0 && f.SYMA_CAM == 0) {
+        if (syma_f.SYMA_CAM == 0) {
+          if (syma_f.SYMA_SHOT == 0 && rcOptions[BOXSYMASHOT]) {
+            f.SYMA_SHOT = 1;
+            syma_f.SYMA_SHOT = 1;
+            cam_syma_time   = 0;
+          } else if (syma_f.SYMA_SHOT == 1 && !rcOptions[BOXSYMASHOT]) {
+            f.SYMA_SHOT = 1;
+            syma_f.SYMA_SHOT = 0;
+            cam_syma_time   = 0;
+          }
+          else if (rcOptions[BOXSYMACAM]) {
+            f.SYMA_CAM = 1;
+            syma_f.SYMA_CAM = 1;
+            cam_syma_time   = 0;
+          }
+        } else {
+          if (!rcOptions[BOXSYMACAM]) {
+            f.SYMA_CAM = 1;
+            syma_f.SYMA_CAM = 0;
+            cam_syma_time   = 0;
+          }
+        }
       }
     #endif
 
