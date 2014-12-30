@@ -1449,6 +1449,15 @@ void mixTable() {
   #if defined(SERVO_TILT)
     servo[0] = get_middle(0);
     servo[1] = get_middle(1);
+
+	#ifdef TILT_PITCH_AUX_CH
+	  servo[0] = TILT_PITCH_MIDDLE + rcData[TILT_PITCH_AUX_CH]-1500;
+	#endif
+	
+	#ifdef TILT_ROLL_AUX_CH
+	  servo[1]  = TILT_ROLL_MIDDLE  + rcData[TILT_ROLL_AUX_CH]-1500;
+	#endif
+	
     if (rcOptions[BOXCAMSTAB]) {
       servo[0] += ((int32_t)conf.servoConf[0].rate * att.angle[PITCH]) /50L;
       servo[1] += ((int32_t)conf.servoConf[1].rate * att.angle[ROLL])  /50L;

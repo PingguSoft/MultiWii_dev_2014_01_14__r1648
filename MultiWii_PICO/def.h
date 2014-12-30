@@ -9,8 +9,8 @@
   #define I2C_SPEED 400000L
   #define MPU6050       //combo + ACC
   #define MPU6050_LPF_42HZ
-  #define HMC5883     // magnetor
-  #define BMP085      // barometer
+//  #define HMC5883     // magnetor
+//  #define BMP085      // barometer
   #define FORCE_ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  =  Y; imu.accADC[PITCH]  = -X; imu.accADC[YAW]  = Z;}
   #define FORCE_GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] =  X; imu.gyroADC[PITCH] =  Y; imu.gyroADC[YAW] = -Z;}
   #define FORCE_MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  =  Y; imu.magADC[PITCH]  =  X; imu.magADC[YAW]  = Z;}
@@ -26,12 +26,13 @@
   #define VBATNOMINAL       126 // 12,6V full battery nominal voltage - only used for lcd.telemetry
   #define VBATLEVEL_WARN1   105 // (*) 10,5V
   #define VBATLEVEL_WARN2   100 // (*) 10.0V
-  #define VBATLEVEL_CRIT    93 //  (*) 9.3V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
+  #define VBATLEVEL_CRIT    84 //  (*) 8.4V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
   #define NO_VBAT           10  // (*) Avoid beeping without any battery
 
-  #define EXT_MOTOR_RANGE
+//  #define EXT_MOTOR_RANGE
+  #define EXT_MOTOR_1KHZ
   #define MOTOR_STOP
-  #define DEADBAND 24
+//  #define DEADBAND 24
 
   #undef  SERIAL0_COM_SPEED
   #define SERIAL0_COM_SPEED 57600
@@ -44,7 +45,7 @@
   #define MAXTHROTTLE 2000
 
   #define SERIAL_RECEIVER_ONLY  1
-  #define REVERSE_LED           1
+//  #define REVERSE_LED           1
 
   #define CAM_SYMA_PIN          12
   #define CAM_SYMA_PIN_PINMODE_OUT pinMode(CAM_SYMA_PIN,OUTPUT);

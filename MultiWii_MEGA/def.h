@@ -21,8 +21,8 @@
 
   #define GPS_SERIAL 1
   #define GPS_BAUD   115200
-  #define NMEA
-  //#define UBLOX
+//  #define NMEA
+  #define UBLOX
   #define BUZZER
   #define PILOTLAMP
   //#define ESC_CALIB_CANNOT_FLY
@@ -58,13 +58,13 @@
   #define TILT_PITCH_MAX    2000    //servo travel max, max value=2000
   #define TILT_PITCH_MIDDLE 1500    //servo neutral value
   #define TILT_PITCH_PROP   10      //servo proportional (tied to angle) ; can be negative to invert movement
-  #define TILT_PITCH_AUX_CH AUX4    //AUX channel to overwrite CAM pitch (AUX1-AUX4), comment to disable manual input and free the AUX channel
+//  #define TILT_PITCH_AUX_CH AUX4    //AUX channel to overwrite CAM pitch (AUX1-AUX4), comment to disable manual input and free the AUX channel
 
   #define TILT_ROLL_MIN     1020
   #define TILT_ROLL_MAX     2000
   #define TILT_ROLL_MIDDLE  1500
   #define TILT_ROLL_PROP    10
-//#define TILT_ROLL_AUX_CH  AUX4    //AUX channel to overwrite CAM Roll (AUX1-AUX4), comment to disable manual input and free the AUX channel
+  #define TILT_ROLL_AUX_CH  AUX4    //AUX channel to overwrite CAM Roll (AUX1-AUX4), comment to disable manual input and free the AUX channel
 
   /* if you want to preset min/middle/max values for servos right after flashing, because of limited physical
    * room for servo travel, then you must enable and set all three following options */

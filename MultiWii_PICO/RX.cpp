@@ -429,12 +429,8 @@ void computeRC() {
         if ( rcDataMean[chan] > (uint16_t)rcData[chan] +3)  rcData[chan] = rcDataMean[chan]-2;
       #endif
 
-    #if SERIAL_RECEIVER_ONLY
-      if (chan<8) {
-    #else
       if (chan<8 && rcSerialCount > 0) { // rcData comes from MSP and overrides RX Data until rcSerialCount reaches 0
         rcSerialCount --;
-    #endif
         #if defined(FAILSAFE)
           failsafeCnt = 0;
         #endif
