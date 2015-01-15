@@ -15,6 +15,8 @@
 // Multiwii Serial Protocol 0
 #define MSP_VERSION              0
 
+#define MSP_TX_GPS_DATA          50    //in message          AGPS injection
+
 //to multiwii developpers/committers : do not add new MSP messages without a proper argumentation/agreement on the forum
 #define MSP_IDENT                100   //out message         multitype + multiwii version + protocol version + capability variable
 #define MSP_STATUS               101   //out message         cycletime & errors_count & sensor present & box activation & current setting number
@@ -53,8 +55,6 @@
 #define MSP_SET_SERVO_CONF       212   //in message          Servo settings
 #define MSP_SET_MOTOR            214   //in message          PropBalance function
 
-#define MSP_TX_GPS_DATA          215   //in message          AGPS injection
-
 #define MSP_BIND                 240   //in message          no param
 
 #define MSP_EEPROM_WRITE         250   //in message          no param
@@ -73,7 +73,7 @@
 
 static uint8_t CURRENTPORT=0;
 
-#define INBUF_SIZE 128
+#define INBUF_SIZE 64
 static uint8_t inBuf[INBUF_SIZE][UART_NUMBER];
 static uint8_t checksum[UART_NUMBER];
 static uint8_t indRX[UART_NUMBER];

@@ -58,6 +58,10 @@ extern plog_t plog;
 
 extern int32_t  BaroHome;
 
+#if SERIAL_USER_BUTTON
+  extern uint8_t  userButton;
+#endif
+
 extern int16_t debug[4];
 
 extern conf_t conf;

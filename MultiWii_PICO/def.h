@@ -45,6 +45,7 @@
   #define MAXTHROTTLE 2000
 
   #define SERIAL_RECEIVER_ONLY  1
+  #define SERIAL_USER_BUTTON    1
 //  #define REVERSE_LED           1
 
   #define CAM_SYMA_PIN          12

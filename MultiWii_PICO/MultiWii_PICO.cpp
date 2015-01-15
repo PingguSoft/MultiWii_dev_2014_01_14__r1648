@@ -174,6 +174,11 @@ int16_t  BaroPID = 0;
 int16_t  errorAltitudeI = 0;
 int32_t  BaroHome=0;
 
+#if SERIAL_USER_BUTTON
+  uint8_t  userButton = 0;
+#define USER_BUTTON_ON(idx) (userButton & (1 << idx))
+#endif
+
 // **************
 // gyro+acc IMU
 // **************
@@ -344,8 +349,8 @@ conf_t conf;
 
 #if defined(CAM_SYMA_PIN)
 typedef struct {
-  uint8_t SYMA_SHOT :1 ;
-  uint8_t SYMA_CAM  :1 ;
+  uint8_t triggerShot :1 ;
+  uint8_t triggerCam  :1 ;
 } syma_flag_t;
 
   syma_flag_t syma_f;
@@ -1133,27 +1138,43 @@ void loop () {
     #endif
 
     #if defined(CAM_SYMA_PIN)
-      if (f.SYMA_SHOT == 0 && f.SYMA_CAM == 0) {
-        if (syma_f.SYMA_CAM == 0) {
-          if (syma_f.SYMA_SHOT == 0 && rcOptions[BOXSYMASHOT]) {
-            f.SYMA_SHOT = 1;
-            syma_f.SYMA_SHOT = 1;
-            cam_syma_time   = 0;
-          } else if (syma_f.SYMA_SHOT == 1 && !rcOptions[BOXSYMASHOT]) {
-            f.SYMA_SHOT = 1;
-            syma_f.SYMA_SHOT = 0;
-            cam_syma_time   = 0;
-          }
-          else if (rcOptions[BOXSYMACAM]) {
-            f.SYMA_CAM = 1;
-            syma_f.SYMA_CAM = 1;
-            cam_syma_time   = 0;
+
+      if (syma_f.triggerShot == 0 && syma_f.triggerCam == 0) {
+        if (f.SYMA_CAM == 0) {
+#if SERIAL_USER_BUTTON
+          if (f.SYMA_SHOT == 0 && USER_BUTTON_ON(0)) {
+#else
+          if (f.SYMA_SHOT == 0 && rcOptions[BOXSYMASHOT]) {
+#endif
+            syma_f.triggerShot = 1;
+            f.SYMA_SHOT        = 1;
+            cam_syma_time      = 0;
+#if SERIAL_USER_BUTTON
+          } else if (f.SYMA_SHOT == 1 && !USER_BUTTON_ON(0)) {
+#else
+          } else if (f.SYMA_SHOT == 1 && !rcOptions[BOXSYMASHOT]) {
+#endif
+            syma_f.triggerShot = 1;
+            f.SYMA_SHOT        = 0;
+            cam_syma_time      = 0;
+#if SERIAL_USER_BUTTON
+          } else if (USER_BUTTON_ON(1)) {
+#else
+          } else if (rcOptions[BOXSYMACAM]) {
+#endif
+            syma_f.triggerCam  = 1;
+            f.SYMA_CAM         = 1;
+            cam_syma_time      = 0;
           }
         } else {
+#if SERIAL_USER_BUTTON
+          if (!USER_BUTTON_ON(1)) {
+#else
           if (!rcOptions[BOXSYMACAM]) {
-            f.SYMA_CAM = 1;
-            syma_f.SYMA_CAM = 0;
-            cam_syma_time   = 0;
+#endif
+            syma_f.triggerCam  = 1;
+            f.SYMA_CAM         = 0;
+            cam_syma_time      = 0;
           }
         }
       }
@@ -1224,22 +1245,21 @@ void loop () {
  //***********************************
 
   #if defined(CAM_SYMA_PIN)
-    if (f.SYMA_SHOT) {
+    if (syma_f.triggerShot) {
       if (cam_syma_time == 0) {
         CAM_SYMA_PIN_LOW;
         cam_syma_time = millis();
       }
       if (millis() - cam_syma_time > 220) {
-        f.SYMA_SHOT = 0;
+        syma_f.triggerShot = 0;
         CAM_SYMA_PIN_HIGH;
       }
-    } else if (f.SYMA_CAM) {
+    } else if (syma_f.triggerCam) {
       if (cam_syma_time == 0) {
         CAM_SYMA_PIN_LOW;
         cam_syma_time = millis();
-      }
-      if (millis() - cam_syma_time > 720) {
-        f.SYMA_CAM = 0;
+      } else if (millis() - cam_syma_time > 720) {
+        syma_f.triggerCam = 0;
         CAM_SYMA_PIN_HIGH;
       }
     }

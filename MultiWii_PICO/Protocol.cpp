@@ -15,6 +15,10 @@
 // Multiwii Serial Protocol 0
 #define MSP_VERSION              0
 
+#if SERIAL_USER_BUTTON
+#define MSP_SET_USER_BUTTON      51
+#endif
+
 //to multiwii developpers/committers : do not add new MSP messages without a proper argumentation/agreement on the forum
 #define MSP_IDENT                100   //out message         multitype + multiwii version + protocol version + capability variable
 #define MSP_STATUS               101   //out message         cycletime & errors_count & sensor present & box activation & current setting number
@@ -242,6 +246,14 @@ void evaluateCommand() {
   uint32_t tmp=0;
 
   switch(cmdMSP[CURRENTPORT]) {
+    
+#if SERIAL_USER_BUTTON
+    case MSP_SET_USER_BUTTON:
+        userButton = read8();
+        headSerialReply(0);
+        break;
+#endif
+    
    case MSP_SET_RAW_RC:
      s_struct_w((uint8_t*)&rcSerial,16);
    #if SERIAL_RECEIVER_ONLY
