@@ -59,7 +59,7 @@ extern plog_t plog;
 extern int32_t  BaroHome;
 
 #if SERIAL_USER_BUTTON
-  extern uint8_t  userButton;
+  extern uint8_t  byteUserButton;
 #endif
 
 extern int16_t debug[4];

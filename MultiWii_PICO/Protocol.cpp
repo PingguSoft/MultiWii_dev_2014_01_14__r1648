@@ -246,14 +246,14 @@ void evaluateCommand() {
   uint32_t tmp=0;
 
   switch(cmdMSP[CURRENTPORT]) {
-    
+
 #if SERIAL_USER_BUTTON
     case MSP_SET_USER_BUTTON:
-        userButton = read8();
+        byteUserButton = read8();
         headSerialReply(0);
         break;
 #endif
-    
+
    case MSP_SET_RAW_RC:
      s_struct_w((uint8_t*)&rcSerial,16);
    #if SERIAL_RECEIVER_ONLY

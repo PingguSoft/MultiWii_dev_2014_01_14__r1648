@@ -175,8 +175,9 @@ int16_t  errorAltitudeI = 0;
 int32_t  BaroHome=0;
 
 #if SERIAL_USER_BUTTON
-  uint8_t  userButton = 0;
-#define USER_BUTTON_ON(idx) (userButton & (1 << idx))
+  uint8_t  byteUserButton = 0;
+  uint8_t  byteOldUserButton = 0;
+#define USER_BUTTON_ON(idx) (byteUserButton & (1 << idx))
 #endif
 
 // **************
@@ -1137,41 +1138,24 @@ void loop () {
       else {f.PASSTHRU_MODE = 0;}
     #endif
 
-    #if defined(CAM_SYMA_PIN)
-
+    #if 0 //defined(CAM_SYMA_PIN)
       if (syma_f.triggerShot == 0 && syma_f.triggerCam == 0) {
         if (f.SYMA_CAM == 0) {
-#if SERIAL_USER_BUTTON
-          if (f.SYMA_SHOT == 0 && USER_BUTTON_ON(0)) {
-#else
           if (f.SYMA_SHOT == 0 && rcOptions[BOXSYMASHOT]) {
-#endif
             syma_f.triggerShot = 1;
             f.SYMA_SHOT        = 1;
             cam_syma_time      = 0;
-#if SERIAL_USER_BUTTON
-          } else if (f.SYMA_SHOT == 1 && !USER_BUTTON_ON(0)) {
-#else
           } else if (f.SYMA_SHOT == 1 && !rcOptions[BOXSYMASHOT]) {
-#endif
             syma_f.triggerShot = 1;
             f.SYMA_SHOT        = 0;
             cam_syma_time      = 0;
-#if SERIAL_USER_BUTTON
-          } else if (USER_BUTTON_ON(1)) {
-#else
           } else if (rcOptions[BOXSYMACAM]) {
-#endif
             syma_f.triggerCam  = 1;
             f.SYMA_CAM         = 1;
             cam_syma_time      = 0;
           }
         } else {
-#if SERIAL_USER_BUTTON
-          if (!USER_BUTTON_ON(1)) {
-#else
           if (!rcOptions[BOXSYMACAM]) {
-#endif
             syma_f.triggerCam  = 1;
             f.SYMA_CAM         = 0;
             cam_syma_time      = 0;
@@ -1180,6 +1164,37 @@ void loop () {
       }
     #endif
 
+    #if 1
+      if (byteOldUserButton != byteUserButton) {
+        if (syma_f.triggerShot == 0 && syma_f.triggerCam == 0) {
+          if (f.SYMA_CAM == 0) {
+            if (f.SYMA_SHOT == 0 && USER_BUTTON_ON(0)) {
+              syma_f.triggerShot = 1;
+              f.SYMA_SHOT        = 1;
+              cam_syma_time      = 0;
+            } else if (f.SYMA_SHOT == 1 && !USER_BUTTON_ON(0)) {
+              syma_f.triggerShot = 1;
+              f.SYMA_SHOT        = 0;
+              cam_syma_time      = 0;
+            } else if (USER_BUTTON_ON(1)) {
+              syma_f.triggerCam  = 1;
+              f.SYMA_CAM         = 1;
+              cam_syma_time      = 0;
+            }
+          } else {
+            if (!USER_BUTTON_ON(1)) {
+              syma_f.triggerCam  = 1;
+              f.SYMA_CAM         = 0;
+              cam_syma_time      = 0;
+            }
+          }
+        }
+      }
+    #endif
+
+#if SERIAL_USER_BUTTON
+    byteOldUserButton = byteUserButton;
+#endif
   } else { // not in rc loop
     static uint8_t taskOrder=0; // never call all functions in the same loop, to avoid high delay spikes
     if(taskOrder>4) taskOrder-=5;
