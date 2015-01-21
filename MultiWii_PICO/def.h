@@ -29,8 +29,8 @@
   #define VBATLEVEL_CRIT    84 //  (*) 8.4V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
   #define NO_VBAT           10  // (*) Avoid beeping without any battery
 
-//  #define EXT_MOTOR_RANGE
-  #define EXT_MOTOR_1KHZ
+  #define EXT_MOTOR_RANGE
+//  #define EXT_MOTOR_1KHZ
   #define MOTOR_STOP
 //  #define DEADBAND 24
 
@@ -49,10 +49,11 @@
 //  #define REVERSE_LED           1
 
   #define CAM_SYMA_PIN          12
+#if defined(CAM_SYMA_PIN)
   #define CAM_SYMA_PIN_PINMODE_OUT pinMode(CAM_SYMA_PIN,OUTPUT);
   #define CAM_SYMA_PIN_HIGH     PORTB |= 1<<4;
   #define CAM_SYMA_PIN_LOW      PORTB &= ~(1<<4);
-
+#endif
   // SONAR
   /* Generic sonar: hc-sr04, srf04, dyp-me007, all generic sonar with echo/pulse pin
      default pulse is PH6/12, echo is PB4/11

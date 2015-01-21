@@ -1164,7 +1164,7 @@ void loop () {
       }
     #endif
 
-    #if 1
+  #if SERIAL_USER_BUTTON
       if (byteOldUserButton != byteUserButton) {
         if (syma_f.triggerShot == 0 && syma_f.triggerCam == 0) {
           if (f.SYMA_CAM == 0) {
