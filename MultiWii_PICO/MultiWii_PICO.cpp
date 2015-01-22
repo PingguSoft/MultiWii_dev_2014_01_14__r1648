@@ -1164,8 +1164,9 @@ void loop () {
       }
     #endif
 
-  #if SERIAL_USER_BUTTON
+    #if SERIAL_USER_BUTTON
       if (byteOldUserButton != byteUserButton) {
+    #if defined(CAM_SYMA_PIN)
         if (syma_f.triggerShot == 0 && syma_f.triggerCam == 0) {
           if (f.SYMA_CAM == 0) {
             if (f.SYMA_SHOT == 0 && USER_BUTTON_ON(0)) {
@@ -1189,12 +1190,10 @@ void loop () {
             }
           }
         }
+    #endif
+        byteOldUserButton = byteUserButton;
       }
     #endif
-
-#if SERIAL_USER_BUTTON
-    byteOldUserButton = byteUserButton;
-#endif
   } else { // not in rc loop
     static uint8_t taskOrder=0; // never call all functions in the same loop, to avoid high delay spikes
     if(taskOrder>4) taskOrder-=5;
